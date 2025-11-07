@@ -50,11 +50,15 @@ We've tested on Linux with GPU 3090, 4090, A100, V100, Jetson Orin. Other GPUs s
 
 ```
 conda env create -f environment.yml
-conda run -n foundation_stereo pip install flash-attn
 conda activate foundation_stereo
+# install flash-attn using the env's Python and disable build isolation so it can see torch
+python -m pip install --no-build-isolation --no-cache-dir "flash-attn>=2.6,<2.9"
 ```
 
-Note that `flash-attn` needs to be installed separately to avoid [errors during environment creation](https://github.com/NVlabs/FoundationStereo/issues/20).
+Notes:
+- We install `flash-attn` separately and with `--no-build-isolation` so the build can import the already-installed `torch` (otherwise you may see `ModuleNotFoundError: No module named 'torch'`).
+- If a prebuilt wheel isn't available for your platform, pip will build from source. In that case, ensure you have a CUDA 12.x toolkit (e.g., system CUDA 12.1+) available on PATH or installed via conda. You can also try a specific compatible version, e.g. `python -m pip install --no-build-isolation flash-attn==2.6.3`.
+- For general conda install issues, see [this thread](https://github.com/NVlabs/FoundationStereo/issues/20).
 
 
 # Model Weights
