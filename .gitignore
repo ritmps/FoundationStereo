@@ -1,10 +1,14 @@
 pretrained_models/*
+!pretrained_models/.gitkeep
 output/*
+!output/.gitkeep
 test_outputs/*
+!test_outputs/.gitkeep
 *.pyc
 weight/
 __pycache__
 DATA/*
+!DATA/.gitkeep
 *.ply
 *.npy
 *.pth

@@ -1,0 +1,8 @@
+# Place pretrained model checkpoints here
+# Download models from: https://drive.google.com/drive/folders/1VhPebc_mMxWKccrv7pdQLTvXYVcLYpsf
+# 
+# Expected structure:
+#   pretrained_models/23-51-11/model_best_bp2.pth
+#   pretrained_models/11-33-40/model_best_bp2.pth
+#
+# Model files are excluded from git via .gitignore
