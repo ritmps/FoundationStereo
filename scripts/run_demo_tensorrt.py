@@ -6,7 +6,7 @@ warnings.filterwarnings('ignore')  # TODO
 import argparse
 import cv2
 import glob
-import imageio
+import imageio.v2 as imageio
 import logging
 import os
 import numpy as np
@@ -32,6 +32,20 @@ from core.utils.utils import InputPadder
 
 def preprocess(image_path, args):
     input_image = imageio.imread(image_path)
+    
+    # Handle different image formats
+    # EXR files: convert from float HDR to uint8 [0-255] range
+    if input_image.dtype in [np.float32, np.float16, np.float64]:
+        input_image = np.clip(input_image * 255.0, 0, 255).astype(np.uint8)
+    
+    # Convert grayscale to RGB if needed
+    if input_image.ndim == 2:
+        input_image = cv2.cvtColor(input_image, cv2.COLOR_GRAY2RGB)
+    
+    # Handle RGBA → RGB
+    if input_image.shape[-1] == 4:
+        input_image = cv2.cvtColor(input_image, cv2.COLOR_RGBA2RGB)
+    
     if args.height and args.width:
       input_image = cv2.resize(input_image, (args.width, args.height))
     resized_image = torch.as_tensor(input_image.copy()).float()[None].permute(0,3,1,2).contiguous()

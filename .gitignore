@@ -1,6 +1,14 @@
 pretrained_models/*
 output/*
+test_outputs/*
 *.pyc
 weight/
 __pycache__
 DATA/*
+*.ply
+*.npy
+*.pth
+*.plan
+*.onnx
+.vscode/
+.idea/

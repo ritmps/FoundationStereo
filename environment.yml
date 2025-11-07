@@ -6,11 +6,14 @@ channels:
   - defaults
 dependencies:
   - python=3.11
+  # Install PyTorch stack via conda so it's available before building flash-attn.
+  # Pin CUDA 12.1 toolkit through pytorch-cuda to match torch 2.4.1 wheels.
+  - pytorch==2.4.1
+  - torchvision==0.19.1
+  - torchaudio==2.4.1
+  - pytorch-cuda=12.1
   - pip
   - pip:
-    - torch==2.4.1
-    - torchvision==0.19.1
-    - torchaudio==2.4.1
     - scikit-image
     - omegaconf
     - opencv-contrib-python
@@ -26,6 +29,9 @@ dependencies:
     - trimesh
     - pyyaml
     - imageio
+    - imagecodecs
+    - OpenEXR
+    - Imath
     - open3d
     - transformations
     - einops
@@ -33,3 +39,4 @@ dependencies:
     - nodejs
     - xformers==0.0.28.post1
     - huggingface-hub
+  # flash-attn intentionally omitted: install manually with --no-build-isolation after env creation.

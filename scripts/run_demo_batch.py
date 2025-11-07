@@ -15,7 +15,7 @@ import numpy as np
 import torch
 import torch.multiprocessing as mp
 import cv2
-import imageio
+import imageio.v2 as imageio
 from omegaconf import OmegaConf
 import open3d as o3d
 from scipy.spatial.transform import Rotation as R
@@ -72,7 +72,7 @@ class CuSFMDataInference:
         if 'vit_size' not in cfg:
             cfg['vit_size'] = 'vitl'
         self.model = FoundationStereo(cfg)
-        ckpt = torch.load(self.args.ckpt_dir, map_location=self.device)
+        ckpt = torch.load(self.args.ckpt_dir, map_location=self.device, weights_only=False)
         self.model.load_state_dict(ckpt['model'])
         self.model.to(self.device)
         self.model.eval()
@@ -227,6 +227,26 @@ class CuSFMDataInference:
 
             img0 = imageio.imread(left_file)
             img1 = imageio.imread(right_file)
+            
+            # Handle different image formats
+            # EXR files: convert from float HDR to uint8 [0-255] range
+            if img0.dtype in [np.float32, np.float16, np.float64]:
+                img0 = np.clip(img0 * 255.0, 0, 255).astype(np.uint8)
+            if img1.dtype in [np.float32, np.float16, np.float64]:
+                img1 = np.clip(img1 * 255.0, 0, 255).astype(np.uint8)
+            
+            # Convert grayscale to RGB if needed
+            if img0.ndim == 2:
+                img0 = cv2.cvtColor(img0, cv2.COLOR_GRAY2RGB)
+            if img1.ndim == 2:
+                img1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2RGB)
+            
+            # Handle RGBA → RGB
+            if img0.shape[-1] == 4:
+                img0 = cv2.cvtColor(img0, cv2.COLOR_RGBA2RGB)
+            if img1.shape[-1] == 4:
+                img1 = cv2.cvtColor(img1, cv2.COLOR_RGBA2RGB)
+            
             H_big, W_big = img0.shape[:2]
             scale = self.args.scale
             img0 = cv2.resize(img0, fx=scale, fy=scale, dsize=None)
